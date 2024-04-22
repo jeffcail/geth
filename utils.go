@@ -2,11 +2,12 @@ package geth
 
 import (
 	"crypto/ecdsa"
-	"fmt"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
-	"golang.org/x/crypto/sha3"
 	"log"
+	"math"
+	"math/big"
 )
 
 var (
@@ -14,7 +15,8 @@ var (
 	CanNotType              = "cannot assert type: publicKey is not of type *ecdsa.PublicKey"
 )
 
-func genEthAddress() {
+// genEthAddress
+func genEthAddress() (string, string) {
 	var (
 		privateKey *ecdsa.PrivateKey
 		err        error
@@ -25,7 +27,7 @@ func genEthAddress() {
 	}
 
 	privateKeyBytes := crypto.FromECDSA(privateKey)
-	fmt.Println(hexutil.Encode(privateKeyBytes)[2:])
+	privateKeyStr := hexutil.Encode(privateKeyBytes)[2:]
 
 	publicKey := privateKey.Public()
 	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
@@ -33,13 +35,28 @@ func genEthAddress() {
 		log.Fatal(CanNotType)
 	}
 
-	publicKeyBytes := crypto.FromECDSAPub(publicKeyECDSA)
-	fmt.Println(hexutil.Encode(publicKeyBytes)[4:])
+	//publicKeyBytes := crypto.FromECDSAPub(publicKeyECDSA)
 
 	address := crypto.PubkeyToAddress(*publicKeyECDSA).Hex()
-	fmt.Println(address)
 
-	hash := sha3.NewLegacyKeccak256()
-	hash.Write(publicKeyBytes[1:])
-	fmt.Println(hexutil.Encode(hash.Sum(nil)[12:]))
+	return privateKeyStr, address
+
+	//hash := sha3.NewLegacyKeccak256()
+	//hash.Write(publicKeyBytes[1:])
+	//encode := hexutil.Encode(hash.Sum(nil)[12:])
+	//fmt.Println()
+}
+
+// hexToAddress
+func hexToAddress(s string) common.Address {
+	return common.HexToAddress(s)
+}
+
+// balanceToWei
+// 以太坊中的数字是使用尽可能小的单位来处理的，因为它们是定点精度，在ETH中它是wei。要读取ETH值，您必须做计算wei/10^18
+func balanceToWei(balance *big.Int) *big.Float {
+	b := new(big.Float)
+	b.SetString(b.String())
+	ethValue := new(big.Float).Quo(b, big.NewFloat(math.Pow10(18)))
+	return ethValue
 }

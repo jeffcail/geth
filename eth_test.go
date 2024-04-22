@@ -11,5 +11,7 @@ func TestEthClient_EthAccount(t *testing.T) {
 	fmt.Println("eth client dial success...😊😊😊")
 	fmt.Println(cli.r)
 
-	cli.EthAccount()
+	privateKey, address := cli.EthAccount()
+	fmt.Println(privateKey)
+	fmt.Println(address)
 }
