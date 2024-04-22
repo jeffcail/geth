@@ -8,6 +8,7 @@ import (
 	"log"
 	"math"
 	"math/big"
+	"regexp"
 )
 
 var (
@@ -59,4 +60,13 @@ func balanceToWei(balance *big.Int) *big.Float {
 	b.SetString(b.String())
 	ethValue := new(big.Float).Quo(b, big.NewFloat(math.Pow10(18)))
 	return ethValue
+}
+
+var (
+	regComStr = "^0x[0-9a-fA-F]{40}$"
+)
+
+// ValidaEthAddress 校验地址是否有效
+func ValidaEthAddress(address string) bool {
+	return regexp.MustCompile(regComStr).MatchString(address)
 }
